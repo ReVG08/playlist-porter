@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+work/
+.env
+.env.local
+.playlist-porter/
+coverage/
+*.log
+*.tsbuildinfo
+.DS_Store

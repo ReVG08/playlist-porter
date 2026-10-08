@@ -2,7 +2,7 @@
 
 ### Move Spotify and TIDAL playlists privately—from a real desktop app.
 
-Playlist Porter is a free, open-source playlist transfer app for macOS and Windows. It runs entirely on your computer, connects directly to Spotify and TIDAL through their official APIs, and gives you control over uncertain track matches before anything is created.
+Playlist Porter is a free, source-available playlist transfer app for macOS and Windows. It runs entirely on your computer, connects directly to Spotify and TIDAL through their official APIs, and gives you control over uncertain track matches before anything is created.
 
 No subscription. No hosted account. No tracking. No audio copying.
 
@@ -221,4 +221,8 @@ Bug reports and pull requests are welcome. Please preserve the privacy model and
 
 ## License
 
-Playlist Porter is fully open source under the permissive [MIT License](LICENSE). You may use, study, modify, and redistribute it under the license terms.
+Playlist Porter is source available under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may inspect, use, modify, and share it for permitted noncommercial purposes under those terms.
+
+Commercial use is not granted. You may not sell Playlist Porter, charge for access to it, include it in a paid product or service, or distribute a paid build without explicit written permission from the creator. Contact the repository owner through GitHub to request a separate commercial license.
+
+Because commercial use is restricted, this project is accurately described as **source available**, not OSI-approved open source.
