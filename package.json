@@ -1,6 +1,6 @@
 {
   "name": "playlist-porter",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "license": "PolyForm-Noncommercial-1.0.0",
   "description": "Local-first Spotify and TIDAL playlist transfer",

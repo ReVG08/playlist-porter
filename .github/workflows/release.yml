@@ -34,7 +34,7 @@ jobs:
         if: matrix.platform == 'mac'
         run: |
           if [ -z "$CSC_LINK" ]; then unset CSC_LINK CSC_KEY_PASSWORD; fi
-          npx electron-builder --mac dmg zip --publish never
+          npx electron-builder --mac dmg zip --arm64 --x64 --publish never
         env:
           CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
