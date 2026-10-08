@@ -32,13 +32,17 @@ jobs:
       - run: npm run desktop:bundle
       - name: Build macOS installers
         if: matrix.platform == 'mac'
-        run: npx electron-builder --mac dmg zip --publish never
+        run: |
+          if [ -z "$CSC_LINK" ]; then unset CSC_LINK CSC_KEY_PASSWORD; fi
+          npx electron-builder --mac dmg zip --publish never
         env:
           CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
       - name: Build Windows installers
         if: matrix.platform == 'win'
-        run: npx electron-builder --win nsis portable --publish never
+        run: |
+          if (-not $env:WIN_CSC_LINK) { Remove-Item Env:WIN_CSC_LINK, Env:WIN_CSC_KEY_PASSWORD -ErrorAction SilentlyContinue }
+          npx electron-builder --win nsis portable --publish never
         env:
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
