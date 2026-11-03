@@ -1,13 +1,13 @@
-import { app, BrowserWindow, nativeTheme, session, shell } from 'electron';
+import { app, BrowserWindow, dialog, nativeTheme, session, shell } from 'electron';
 import { join } from 'node:path';
+import { canOpenExternal, LOCAL_ORIGIN, navigationAction } from './navigation.js';
 
-const LOCAL_ORIGIN = 'http://127.0.0.1:8787';
-const externalHosts = new Set(['accounts.spotify.com', 'login.tidal.com', 'open.spotify.com', 'tidal.com', 'listen.tidal.com']);
 let mainWindow: BrowserWindow | undefined;
 
-function safeExternal(url: string): boolean {
-  try { return new URL(url).protocol === 'https:' && externalHosts.has(new URL(url).hostname); }
-  catch { return false; }
+function openInBrowser(url: string): void {
+  void shell.openExternal(url).catch(() => {
+    dialog.showErrorBox('Could not open your browser', 'Playlist Porter could not open your default browser. Set a default browser in your operating-system settings, then select Connect again.');
+  });
 }
 
 async function createWindow(): Promise<void> {
@@ -20,14 +20,17 @@ async function createWindow(): Promise<void> {
   mainWindow.removeMenu();
   mainWindow.once('ready-to-show', () => mainWindow?.show());
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (safeExternal(url)) void shell.openExternal(url);
+    if (canOpenExternal(url)) openInBrowser(url);
     return { action: 'deny' };
   });
-  mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.startsWith(LOCAL_ORIGIN)) return;
+  const handleNavigation = (event: Electron.Event, url: string) => {
+    const action = navigationAction(url);
+    if (action === 'allow') return;
     event.preventDefault();
-    if (safeExternal(url)) void shell.openExternal(url);
-  });
+    if (action === 'external') openInBrowser(url);
+  };
+  mainWindow.webContents.on('will-navigate', handleNavigation);
+  mainWindow.webContents.on('will-redirect', handleNavigation);
   await mainWindow.loadURL(LOCAL_ORIGIN);
 }
 
@@ -42,7 +45,13 @@ else {
     const { startServer } = await import('../server/index.js');
     await startServer();
     await createWindow();
-  }).catch((error) => { console.error(error); app.quit(); });
+  }).catch((error: unknown) => {
+    const addressInUse = error instanceof Error && 'code' in error && error.code === 'EADDRINUSE';
+    dialog.showErrorBox('Playlist Porter could not start', addressInUse
+      ? 'Local port 8787 is already in use. Close other Playlist Porter instances or the app using that port, then reopen Playlist Porter.'
+      : 'The local application could not start. Check that Playlist Porter has permission to use its application data folder, then reopen it.');
+    app.quit();
+  });
 }
 
 app.on('window-all-closed', () => app.quit());

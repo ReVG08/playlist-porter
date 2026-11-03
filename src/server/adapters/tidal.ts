@@ -15,7 +15,7 @@ const durationMs = (value?: string): number => {
 export class TidalService implements MusicService {
   readonly service = 'tidal' as const;
   private countryCode?: string;
-  private async headers(jsonApi = false): Promise<Record<string, string>> { return { authorization: `Bearer ${await accessToken('tidal')}`, accept: 'application/vnd.tidal.v1+json', 'content-type': jsonApi ? 'application/vnd.api+json' : 'application/vnd.tidal.v1+json' }; }
+  private async headers(): Promise<Record<string, string>> { return { authorization: `Bearer ${await accessToken('tidal')}`, accept: 'application/vnd.api+json', 'content-type': 'application/vnd.api+json' }; }
   private relationships(resource: Resource, included: Resource[] = []): { artists: string[]; album?: string } {
     const ids = (name: string) => resource.relationships?.[name]?.data?.map((item) => `${item.type}:${item.id}`) ?? [];
     const byKey = new Map(included.map((item) => [`${item.type}:${item.id}`, item]));
@@ -82,14 +82,14 @@ export class TidalService implements MusicService {
   }
 
   async createPlaylist(name: string, description?: string): Promise<PlaylistSummary> {
-    const page = await requestJson<Document>(`${API}/playlists`, { method: 'POST', headers: { ...await this.headers(true), 'idempotency-key': randomUUID() }, body: JSON.stringify({ data: { type: 'playlists', attributes: { name, description, accessType: 'UNLISTED' } } }) });
+    const page = await requestJson<Document>(`${API}/playlists`, { method: 'POST', headers: { ...await this.headers(), 'idempotency-key': randomUUID() }, body: JSON.stringify({ data: { type: 'playlists', attributes: { name, description, accessType: 'UNLISTED' } } }) });
     const p = Array.isArray(page.data) ? page.data[0] : page.data;
     return { id: p.id, service: 'tidal', name: String(p.attributes?.name ?? name), description: p.attributes?.description || undefined, trackCount: 0, url: p.attributes?.externalLinks?.find((link: any) => link.href)?.href };
   }
 
   async addTracks(playlistId: string, trackIds: string[]): Promise<void> {
     for (let index = 0; index < trackIds.length; index += 50) {
-      await requestJson(`${API}/playlists/${encodeURIComponent(playlistId)}/relationships/items`, { method: 'POST', headers: { ...await this.headers(true), 'idempotency-key': randomUUID() }, body: JSON.stringify({ data: trackIds.slice(index, index + 50).map((id) => ({ type: 'tracks', id })) }) });
+      await requestJson(`${API}/playlists/${encodeURIComponent(playlistId)}/relationships/items`, { method: 'POST', headers: { ...await this.headers(), 'idempotency-key': randomUUID() }, body: JSON.stringify({ data: trackIds.slice(index, index + 50).map((id) => ({ type: 'tracks', id })) }) });
     }
   }
 }

@@ -11,6 +11,8 @@ No subscription. No hosted account. No tracking. No audio copying.
 
 ## Download
 
+**v1.1.3 fixes account connection:** Spotify and TIDAL sign-in now open in your default browser, leaving Playlist Porter open for the callback. If sign-in opens inside an older version of the app, install the latest release and try again.
+
 Open the [latest GitHub release](https://github.com/ReVG08/playlist-porter/releases/latest) and choose:
 
 - **macOS Apple Silicon:** `Playlist-Porter-…-mac-arm64.dmg`
@@ -78,6 +80,8 @@ Paste each Client ID into Playlist Porter and select **Save on this computer**.
 
 Select **Connect** beside Spotify. Your default browser opens Spotify's real authorization page; check the address before signing in. Approve the playlist permissions and return to Playlist Porter. Repeat for TIDAL. The cards in the app change to **Connected locally**.
 
+Keep Playlist Porter running until the browser shows **Connected**. You can then close that browser tab and return to the app; connection status refreshes automatically. Register each callback URL exactly as shown above. Desktop builds always use `127.0.0.1:8787`, and Client IDs are read from **Settings**, not a launch-directory `.env` file. Existing saved settings and encrypted tokens are retained when updating.
+
 Playlist Porter never receives your service passwords. The service gives it a limited OAuth token, which is encrypted locally and can be removed with **Disconnect**.
 
 ### 4. Choose the transfer direction
@@ -100,6 +104,9 @@ Use the candidate menu on any row to choose a different recording. Select **Skip
 Select **Transfer**. Playlist Porter creates one new private/unlisted destination playlist and appends the chosen tracks in their original order. The completion screen reports added and skipped totals and links to the finished playlist. Open it in the destination service and spot-check any manually reviewed versions.
 
 ### Troubleshooting
+
+- **Sign-in opens inside the app:** update to v1.1.3 or newer. Connect should launch your operating system's default browser. If necessary, set a default browser and try again.
+- **Using your own developer app:** paste its public Client ID into Settings, save, and then select Connect. No client secret is needed. Each person using their own developer app must register the two exact callback URLs above.
 
 - **“Client ID needed”:** open Settings and paste the correct public Client ID.
 - **OAuth redirect rejected:** the dashboard callback must match exactly, including `http`, `127.0.0.1`, port `8787`, service name, and path.
@@ -190,7 +197,7 @@ npm run build
 npm run desktop:package
 ```
 
-Tests cover normalization, ISRC priority, metadata scoring, ambiguous results, ordered transfers, skips, and reviewed-selection validation.
+Tests cover normalization, ISRC priority, metadata scoring, ambiguous results, ordered transfers, skips, reviewed-selection validation, desktop browser handoff and navigation safety, both providers' PKCE callbacks and refresh flows, saved Client IDs, and TIDAL JSON:API requests.
 
 ## Architecture
 
